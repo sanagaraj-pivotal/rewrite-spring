@@ -17,6 +17,8 @@ package org.openrewrite.java.spring.boot3
 
 import org.junit.jupiter.api.Test
 import org.openrewrite.Recipe
+import org.openrewrite.java.ChangePackage
+import org.openrewrite.java.ChangeType
 import org.openrewrite.java.JavaParser
 import org.openrewrite.java.JavaRecipeTest
 
@@ -32,8 +34,16 @@ class UpdateMicrometerPackageTest : JavaRecipeTest {
             .build()
 
     override val recipe: Recipe
-        get() = UpdateMicrometerPackage()
-
+        get() = ChangeType(
+            "io.micrometer.core.instrument.binder.abc",
+            "io.micrometer.binder.abc",
+            null,
+        )
+//
+//        override val recipe: Recipe
+//        get() = ChangeType("java.util.logging.LoggingMXBean","java.lang.management.PlatformLoggingMXBean", null)
+//
+//    ChangeType("java.util.logging.LoggingMXBean","java.lang.management.PlatformLoggingMXBean", null)
     @Test
     fun topLevelTypeAnnotation() = assertChanged(
         dependsOn = arrayOf("""
@@ -41,20 +51,57 @@ class UpdateMicrometerPackageTest : JavaRecipeTest {
              
             public class abc {
             }
-        """.trimIndent()),
+        """.trimIndent(),
+            """
+            package io.micrometer.binder;
+             
+            public class abc {
+            }
+        """.trimIndent()
+        ),
         before = """
+            package a;
+            import java.util.List;
             import io.micrometer.core.instrument.binder.abc;
             
             class A {
-                void method() {
+                abc method() {
+                    List s;
+                    return null;
                 }
             }
         """,
         after = """
+            package a;
             import io.micrometer.binder.abc;
-
+            import java.util.List;
+            
             class A {
-                void method() {
+                abc method() {
+                    List s;
+                    return null;
+                }
+            }
+        """
+    )
+
+    @Test
+    fun temp() = assertChanged(
+        before = """
+            import java.util.logging.LoggingMXBean;
+
+            class Test {
+                static void method() {
+                    LoggingMXBean loggingBean = null;
+                }
+            }
+        """,
+        after = """
+            import java.lang.management.PlatformLoggingMXBean;
+
+            class Test {
+                static void method() {
+                    PlatformLoggingMXBean loggingBean = null;
                 }
             }
         """
