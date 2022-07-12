@@ -35,75 +35,39 @@ class UpdateMicrometerPackageTest : JavaRecipeTest {
 
     override val recipe: Recipe
         get() = ChangeType(
-            "io.micrometer.core.instrument.binder.abc",
-            "io.micrometer.binder.abc",
+            "io.micrometer.core.instrument.binder.Abc",
+            "io.micrometer.binder.Abc",
             null,
         )
-//
-//        override val recipe: Recipe
-//        get() = ChangeType("java.util.logging.LoggingMXBean","java.lang.management.PlatformLoggingMXBean", null)
-//
-//    ChangeType("java.util.logging.LoggingMXBean","java.lang.management.PlatformLoggingMXBean", null)
     @Test
     fun topLevelTypeAnnotation() = assertChanged(
         dependsOn = arrayOf("""
             package io.micrometer.core.instrument.binder;
              
-            public class abc {
-            }
-        """.trimIndent(),
-            """
-            package io.micrometer.binder;
-             
-            public class abc {
+            public class Abc {
             }
         """.trimIndent()
         ),
         before = """
             package a;
-            import java.util.List;
-            import io.micrometer.core.instrument.binder.abc;
+            import io.micrometer.core.instrument.binder.*;
             
             class A {
-                abc method() {
-                    List s;
+                Abc method() {
                     return null;
                 }
             }
-        """,
+        """.trimIndent(),
         after = """
             package a;
-            import io.micrometer.binder.abc;
-            import java.util.List;
-            
+          
+            import io.micrometer.binder.Abc;
+      
             class A {
-                abc method() {
-                    List s;
+                Abc method() {
                     return null;
                 }
             }
-        """
-    )
-
-    @Test
-    fun temp() = assertChanged(
-        before = """
-            import java.util.logging.LoggingMXBean;
-
-            class Test {
-                static void method() {
-                    LoggingMXBean loggingBean = null;
-                }
-            }
-        """,
-        after = """
-            import java.lang.management.PlatformLoggingMXBean;
-
-            class Test {
-                static void method() {
-                    PlatformLoggingMXBean loggingBean = null;
-                }
-            }
-        """
+        """.trimIndent()
     )
 }
