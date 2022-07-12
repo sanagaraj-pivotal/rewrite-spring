@@ -36,6 +36,12 @@ class UpdateMicrometerPackageTest : JavaRecipeTest {
 
     @Test
     fun topLevelTypeAnnotation() = assertChanged(
+        dependsOn = arrayOf("""
+            package io.micrometer.core.instrument.binder;
+             
+            public class abc {
+            }
+        """.trimIndent()),
         before = """
             import io.micrometer.core.instrument.binder.abc;
             
